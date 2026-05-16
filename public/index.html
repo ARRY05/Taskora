@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Taskora - Team Task Manager</title>
+  <meta name="description" content="Taskora - A professional team task management platform for modern teams." />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="auth-page">
+
+  <div class="auth-container">
+
+    <!-- Logo -->
+    <div class="auth-logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      </div>
+      <h1>Taskora</h1>
+      <p>Collaborate. Track. Deliver.</p>
+    </div>
+
+    <!-- Auth Card -->
+    <div class="auth-card">
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login">Sign In</button>
+        <button class="auth-tab" id="tab-signup">Create Account</button>
+      </div>
+
+      <div class="auth-form-wrap">
+
+        <!-- ── Login Form ── -->
+        <form id="form-login" autocomplete="on">
+          <div class="auth-error" id="err-login"></div>
+
+          <div class="form-group">
+            <label for="login-email">Email Address</label>
+            <input type="email" id="login-email" name="email"
+              placeholder="Enter email" required autocomplete="email" />
+          </div>
+
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" name="password"
+              placeholder="Enter password" required autocomplete="current-password" />
+          </div>
+
+          <button type="submit" class="btn-primary" id="btn-login">Sign In</button>
+
+          <p class="auth-hint">
+            Demo: <strong>arjun@taskora.app</strong> / <strong>Password@123</strong>
+          </p>
+        </form>
+
+        <!-- ── Signup Form ── -->
+        <form id="form-signup" style="display:none" autocomplete="on">
+          <div class="auth-error" id="err-signup"></div>
+
+          <div class="form-group">
+            <label for="signup-name">Full Name</label>
+            <input type="text" id="signup-name" name="name"
+              placeholder="e.g. Rohit Sharma" required autocomplete="name" />
+          </div>
+
+          <div class="form-group">
+            <label for="signup-email">Email Address</label>
+            <input type="email" id="signup-email" name="email"
+              placeholder="rohit@example.com" required autocomplete="email" />
+          </div>
+
+          <div class="form-group">
+            <label for="signup-password">Password</label>
+            <input type="password" id="signup-password" name="password"
+              placeholder="Min. 6 characters" required autocomplete="new-password" />
+          </div>
+
+          <div class="form-group">
+            <label for="signup-confirm">Confirm Password</label>
+            <input type="password" id="signup-confirm" name="confirm"
+              placeholder="Repeat your password" required autocomplete="new-password" />
+          </div>
+
+          <button type="submit" class="btn-primary" id="btn-signup">Create Account</button>
+        </form>
+
+      </div>
+    </div><!-- /auth-card -->
+
+  </div><!-- /auth-container -->
+
+  <!-- Toast container -->
+  <div id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+</body>
+</html>

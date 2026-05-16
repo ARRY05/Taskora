@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Taskora - Dashboard</title>
+  <meta name="description" content="Taskora - Manage your team's tasks and projects." />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+<div class="app-layout">
+
+  <!-- ══════════════ SIDEBAR ══════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="white"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      </div>
+      <span>Taskora</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main Menu</div>
+
+      <div class="nav-item active" data-section="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        <span>Dashboard</span>
+      </div>
+
+      <div class="nav-item" data-section="projects">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
+        </svg>
+        <span>Projects</span>
+      </div>
+
+      <div class="nav-item" data-section="tasks">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 11l3 3L22 4"/>
+          <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+        </svg>
+        <span>Tasks</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebar-avatar">AS</div>
+      <div class="user-info">
+        <div class="user-name"  id="sidebar-user-name">Arjun Sharma</div>
+        <div class="user-email" id="sidebar-user-email">arjun@taskora.app</div>
+      </div>
+      <button class="btn-logout" id="btn-logout" title="Logout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ══════════════ MAIN CONTENT ══════════════ -->
+  <div class="main-content">
+
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div class="topbar-right">
+        <span style="font-size:0.85rem;color:var(--text-secondary)">
+          Welcome, <strong id="topbar-user-name">Arjun</strong>
+        </span>
+      </div>
+    </header>
+
+    <!-- ══════ DASHBOARD SECTION ══════ -->
+    <section class="page-section active" id="section-dashboard">
+
+      <div class="page-header">
+        <div>
+          <h2>Overview</h2>
+          <p>Your team's task activity at a glance</p>
+        </div>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="stats-grid">
+
+        <div class="stat-card">
+          <div class="stat-icon blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 11l3 3L22 4"/>
+              <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-total-tasks">—</div>
+            <div class="stat-label">Total Tasks</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon purple">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-projects">—</div>
+            <div class="stat-label">My Projects</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon amber">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-inprogress">—</div>
+            <div class="stat-label">In Progress</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-done">—</div>
+            <div class="stat-label">Completed</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon red">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-overdue">—</div>
+            <div class="stat-label">Overdue Tasks</div>
+          </div>
+        </div>
+
+      </div><!-- /stats-grid -->
+
+      <!-- Charts & Tables row -->
+      <div class="dashboard-grid">
+
+        <!-- Tasks by Status -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Tasks by Status</span>
+          </div>
+          <div class="card-body">
+            <div class="status-bars">
+
+              <div class="status-bar-item" id="bar-todo">
+                <div class="bar-label">
+                  <span>0</span>
+                  <span>To Do</span>
+                </div>
+                <div class="bar-track">
+                  <div class="bar-fill todo" style="width:0%"></div>
+                </div>
+              </div>
+
+              <div class="status-bar-item" id="bar-inprogress">
+                <div class="bar-label">
+                  <span>0</span>
+                  <span>In Progress</span>
+                </div>
+                <div class="bar-track">
+                  <div class="bar-fill inprogress" style="width:0%"></div>
+                </div>
+              </div>
+
+              <div class="status-bar-item" id="bar-done">
+                <div class="bar-label">
+                  <span>0</span>
+                  <span>Done</span>
+                </div>
+                <div class="bar-track">
+                  <div class="bar-fill done" style="width:0%"></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Tasks -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Tasks</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Project</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Due Date</th>
+                </tr>
+              </thead>
+              <tbody id="recent-tasks-body">
+                <tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text-secondary)">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tasks per User -->
+        <div class="card" style="grid-column:1/-1">
+          <div class="card-header">
+            <span class="card-title">Tasks per Team Member</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>Total Assigned</th>
+                  <th>Completed</th>
+                  <th>Completion %</th>
+                </tr>
+              </thead>
+              <tbody id="tasks-per-user-body">
+                <tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text-secondary)">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /dashboard-grid -->
+
+    </section>
+
+    <!-- ══════ PROJECTS SECTION ══════ -->
+    <section class="page-section" id="section-projects">
+
+      <div class="page-header">
+        <div>
+          <h2>Projects</h2>
+          <p>Manage your team's projects</p>
+        </div>
+        <button class="btn btn-accent" id="btn-new-project">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Project
+        </button>
+      </div>
+
+      <div class="projects-grid" id="projects-grid">
+        <div style="padding:40px;text-align:center;color:var(--text-secondary)">Loading…</div>
+      </div>
+
+    </section>
+
+    <!-- ══════ TASKS SECTION ══════ -->
+    <section class="page-section" id="section-tasks">
+
+      <div class="page-header">
+        <div>
+          <h2>Tasks</h2>
+          <p>View and manage tasks by project</p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <!-- Project selector -->
+          <select id="task-project-select" style="
+            padding:8px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+            font-size:0.875rem;font-family:inherit;background:#fff;color:var(--text-primary);
+            min-width:220px;outline:none;cursor:pointer;">
+            <option value="">— Select a Project —</option>
+          </select>
+          <span id="task-count-badge" style="font-size:0.8rem;color:var(--text-secondary)"></span>
+          <button class="btn btn-accent" id="btn-new-task" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Task
+          </button>
+        </div>
+      </div>
+
+      <!-- Placeholder when no project selected -->
+      <div id="tasks-placeholder" style="display:flex;flex-direction:column;align-items:center;padding:80px 24px;color:var(--text-secondary)">
+        <svg style="width:56px;height:56px;opacity:0.2;margin-bottom:14px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+        </svg>
+        <p style="font-size:0.95rem">Select a project above to view its tasks</p>
+      </div>
+
+      <!-- Tasks table (shown once project is selected) -->
+      <div id="tasks-content" style="display:none">
+
+        <!-- Filter buttons -->
+        <div class="task-filters">
+          <button class="filter-btn active" data-filter="All">All</button>
+          <button class="filter-btn" data-filter="TODO">To Do</button>
+          <button class="filter-btn" data-filter="IN_PROGRESS">In Progress</button>
+          <button class="filter-btn" data-filter="DONE">Done</button>
+        </div>
+
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Task</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Assigned To</th>
+                  <th>Due Date</th>
+                  <th>Created By</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tasks-tbody">
+                <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-secondary)">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /tasks-content -->
+
+    </section>
+
+  </div><!-- /main-content -->
+</div><!-- /app-layout -->
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<!-- ══════════════ MODALS ══════════════ -->
+
+<!-- Create Project Modal -->
+<div class="modal-overlay" id="modal-create-project">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Create New Project</span>
+      <button class="btn-close" onclick="closeModal('modal-create-project')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <form id="form-create-project">
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="new-project-name">Project Name *</label>
+          <input type="text" id="new-project-name" placeholder="e.g. Mobile App Redesign" required />
+        </div>
+        <div class="form-group">
+          <label for="new-project-desc">Description</label>
+          <textarea id="new-project-desc" placeholder="Brief description of the project…"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('modal-create-project')">Cancel</button>
+        <button type="submit" class="btn btn-accent">Create Project</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Project Detail Modal -->
+<div class="modal-overlay" id="modal-project-detail">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="project-detail-title">Project Details</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-accent btn-sm" id="btn-add-member" style="display:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Member
+        </button>
+        <button class="btn-close" onclick="closeModal('modal-project-detail')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body" id="project-detail-body">
+      <div style="text-align:center;padding:24px;color:var(--text-secondary)">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Member Modal -->
+<div class="modal-overlay" id="modal-add-member">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Add Team Member</span>
+      <button class="btn-close" onclick="closeModal('modal-add-member')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <form id="form-add-member">
+      <input type="hidden" id="add-member-project-id" />
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="add-member-email">User Email *</label>
+          <input type="email" id="add-member-email" placeholder="priya@taskora.app" required />
+        </div>
+        <div class="form-group">
+          <label for="add-member-role">Role</label>
+          <select id="add-member-role">
+            <option value="Member">Member</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
+        <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:8px">
+          The user must already have a Taskora account.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('modal-add-member')">Cancel</button>
+        <button type="submit" class="btn btn-accent">Add Member</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Create Task Modal -->
+<div class="modal-overlay" id="modal-create-task">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Create New Task</span>
+      <button class="btn-close" onclick="closeModal('modal-create-task')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <form id="form-create-task">
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="task-title">Title *</label>
+          <input type="text" id="task-title" placeholder="e.g. Design login screen" required />
+        </div>
+        <div class="form-group">
+          <label for="task-description">Description</label>
+          <textarea id="task-description" placeholder="Task details…"></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group">
+            <label for="task-priority">Priority</label>
+            <select id="task-priority">
+              <option value="MEDIUM">Medium</option>
+              <option value="HIGH">High</option>
+              <option value="LOW">Low</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="task-status">Status</label>
+            <select id="task-status">
+              <option value="TODO">To Do</option>
+              <option value="IN_PROGRESS">In Progress</option>
+              <option value="DONE">Done</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="task-due-date">Due Date</label>
+          <input type="date" id="task-due-date" />
+        </div>
+        <div class="form-group">
+          <label for="task-assigned-to">Assign To</label>
+          <select id="task-assigned-to">
+            <option value="">— Unassigned —</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('modal-create-task')">Cancel</button>
+        <button type="submit" class="btn btn-accent">Create Task</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Task Modal -->
+<div class="modal-overlay" id="modal-edit-task">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Edit Task</span>
+      <button class="btn-close" onclick="closeModal('modal-edit-task')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <form id="form-edit-task">
+      <input type="hidden" id="edit-task-id" />
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="edit-task-title">Title *</label>
+          <input type="text" id="edit-task-title" required />
+        </div>
+        <div class="form-group">
+          <label for="edit-task-description">Description</label>
+          <textarea id="edit-task-description"></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group">
+            <label for="edit-task-priority">Priority</label>
+            <select id="edit-task-priority">
+              <option value="HIGH">High</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="LOW">Low</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="edit-task-status">Status</label>
+            <select id="edit-task-status">
+              <option value="TODO">To Do</option>
+              <option value="IN_PROGRESS">In Progress</option>
+              <option value="DONE">Done</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="edit-task-due-date">Due Date</label>
+          <input type="date" id="edit-task-due-date" />
+        </div>
+        <div class="form-group">
+          <label for="edit-task-assigned-to">Assign To</label>
+          <select id="edit-task-assigned-to">
+            <option value="">— Unassigned —</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('modal-edit-task')">Cancel</button>
+        <button type="submit" class="btn btn-accent">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Scripts (order matters) -->
+<script src="/js/api.js"></script>
+<script src="/js/projects.js"></script>
+<script src="/js/tasks.js"></script>
+<script src="/js/app.js"></script>
+
+</body>
+</html>
