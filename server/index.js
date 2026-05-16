@@ -1,76 +1,68 @@
-// ============================================================
-// index.js – Main Express server entry point
-// Starts the HTTP server, mounts all routes, serves frontend
-// ============================================================
-
 require('dotenv').config();
 
-const express   = require('express');
-const cors      = require('cors');
-const path      = require('path');
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
 const { initDb } = require('./db');
 const { getAppEnv, getAppName, getJwtSecret, getSupabaseAnonKey, getSupabaseUrl } = require('./config');
 
-const hasJwtSecret = Boolean(getJwtSecret());
-const hasSupabaseConfig = Boolean(getSupabaseUrl() && getSupabaseAnonKey());
-if (!hasJwtSecret) {
-  console.error('Missing required environment variable: JWT_SECRET or JWT_SECRET_KEY');
-}
-if (!hasSupabaseConfig) {
-  console.error('Missing Supabase variables: VITE_SUPABASE_URL and/or VITE_SUPABASE_ANON_KEY');
-}
-
 const app = express();
+let dbReady = false;
+let dbError = null;
 
-// ── Middleware ────────────────────────────────────────────
+function getHealth() {
+  return {
+    status: dbReady ? 'ok' : 'degraded',
+    app: getAppName(),
+    env: getAppEnv(),
+    hasJwtSecret: Boolean(getJwtSecret()),
+    hasSupabaseConfig: Boolean(getSupabaseUrl() && getSupabaseAnonKey()),
+    dbReady,
+    dbError,
+    timestamp: new Date().toISOString(),
+  };
+}
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Serve static frontend files from the /public folder
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-// ── Boot: init DB first, then mount routes & start server ─
-async function boot() {
-  // Verify Supabase connectivity and seed demo data when needed.
-  await initDb();
-  console.log('Database ready.');
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/projects', require('./routes/projects'));
+app.use('/api/tasks', require('./routes/tasks'));
+app.use('/api/dashboard', require('./routes/dashboard'));
 
-  // Mount API routes (each route file also calls initDb internally)
-  app.use('/api/auth',      require('./routes/auth'));
-  app.use('/api/projects',  require('./routes/projects'));
-  app.use('/api/tasks',     require('./routes/tasks'));
-  app.use('/api/dashboard', require('./routes/dashboard'));
+app.get('/api/health', (req, res) => {
+  res.json(getHealth());
+});
 
-  // Health check
-  app.get('/api/health', (req, res) => {
-    res.json({
-      status: 'ok',
-      app: getAppName(),
-      env: getAppEnv(),
-      hasJwtSecret,
-      hasSupabaseConfig,
-      timestamp: new Date().toISOString()
-    });
-  });
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+});
 
-  // Catch-all: serve index.html (lets frontend handle unknown paths)
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
-  });
+async function checkDatabase() {
+  if (!getJwtSecret()) {
+    console.error('Missing required environment variable: JWT_SECRET or JWT_SECRET_KEY');
+  }
+  if (!getSupabaseUrl() || !getSupabaseAnonKey()) {
+    console.error('Missing Supabase variables: VITE_SUPABASE_URL and/or VITE_SUPABASE_ANON_KEY');
+  }
 
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    console.log(`
-  ╔══════════════════════════════════════╗
-  ║            Taskora Server            ║
-  ║   http://localhost:${PORT}              ║
-  ╚══════════════════════════════════════╝
-    `);
-  });
+  try {
+    await initDb();
+    dbReady = true;
+    dbError = null;
+    console.log('Database ready.');
+  } catch (err) {
+    dbReady = false;
+    dbError = err.message;
+    console.error('Database is not ready:', err);
+  }
 }
 
-boot().catch(err => {
-  console.error('Failed to start server:', err);
-  process.exit(1);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Taskora Server running on port ${PORT}`);
+  checkDatabase();
 });
