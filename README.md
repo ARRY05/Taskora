@@ -113,7 +113,7 @@ Password@123
 Example Admin login:
 
 ```text
-arjun@taskora.app
+aryan@taskora.app
 ```
 
 ## Railway Deployment

@@ -138,6 +138,10 @@ async function initDb() {
     SET email = REPLACE(email, '@' || 'task' || 'flow.in', '@taskora.app')
     WHERE email LIKE '%@' || 'task' || 'flow.in';
 
+    UPDATE users
+    SET name = 'Aryan Kumar', email = 'aryan@taskora.app'
+    WHERE email = 'ar' || 'jun@taskora.app' OR name = 'Ar' || 'jun Sharma';
+
     UPDATE tasks SET status = CASE status
       WHEN 'To Do' THEN 'TODO'
       WHEN 'In Progress' THEN 'IN_PROGRESS'
@@ -161,7 +165,7 @@ async function initDb() {
     const hash = (p) => bcrypt.hashSync(p, 10);
     const PWD  = 'Password@123';
 
-    const u1 = db.prepare('INSERT INTO users (name,email,password) VALUES (?,?,?)').run('Arjun Sharma', 'arjun@taskora.app', hash(PWD)).lastInsertRowid;
+    const u1 = db.prepare('INSERT INTO users (name,email,password) VALUES (?,?,?)').run('Aryan Kumar',  'aryan@taskora.app', hash(PWD)).lastInsertRowid;
     const u2 = db.prepare('INSERT INTO users (name,email,password) VALUES (?,?,?)').run('Priya Patel',  'priya@taskora.app', hash(PWD)).lastInsertRowid;
     const u3 = db.prepare('INSERT INTO users (name,email,password) VALUES (?,?,?)').run('Rahul Verma',  'rahul@taskora.app', hash(PWD)).lastInsertRowid;
     const u4 = db.prepare('INSERT INTO users (name,email,password) VALUES (?,?,?)').run('Sneha Iyer',   'sneha@taskora.app', hash(PWD)).lastInsertRowid;
@@ -184,7 +188,7 @@ async function initDb() {
     it.run(p2,'Leave management workflow',         'Implement leave apply, approve, reject flow.',            'MEDIUM','TODO',        '2026-05-28',u5,u2);
     it.run(p2,'Generate monthly payslip PDF',      'Auto-generate payslip PDF and email to employees.',       'HIGH',  'TODO',        '2026-05-10',u4,u2);
 
-    console.log('Seeded! Login: arjun@taskora.app / Password@123');
+    console.log('Seeded! Login: aryan@taskora.app / Password@123');
   }
 
   dbInstance = db;
