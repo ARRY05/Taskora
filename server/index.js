@@ -9,10 +9,11 @@ const express   = require('express');
 const cors      = require('cors');
 const path      = require('path');
 const { initDb } = require('./db');
+const { getJwtSecret } = require('./config');
 
-const hasJwtSecret = Boolean(process.env.JWT_SECRET && process.env.JWT_SECRET.trim());
+const hasJwtSecret = Boolean(getJwtSecret());
 if (!hasJwtSecret) {
-  console.error('Missing required environment variable: JWT_SECRET');
+  console.error('Missing required environment variable: JWT_SECRET or JWT_SECRET_KEY');
 }
 
 const app = express();

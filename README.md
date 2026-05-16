@@ -99,6 +99,7 @@ Open `http://localhost:3000`.
 | Variable | Description |
 | --- | --- |
 | `JWT_SECRET` | Secret used to sign JWT tokens |
+| `JWT_SECRET_KEY` | Optional fallback secret if the host does not expose `JWT_SECRET` correctly |
 | `PORT` | Server port |
 | `NODE_ENV` | Runtime environment |
 
@@ -123,7 +124,7 @@ aryan@taskora.app
 3. Add environment variables in Railway:
 
 ```text
-JWT_SECRET=your_strong_secret
+JWT_SECRET_KEY=your_strong_secret
 NODE_ENV=production
 ```
 

@@ -9,12 +9,13 @@ const router     = express.Router();
 const bcrypt     = require('bcryptjs');
 const jwt        = require('jsonwebtoken');
 const { initDb } = require('../db');
+const { getJwtSecret } = require('../config');
 
 // Helper: generate a JWT token valid for 7 days
 function generateToken(user) {
   return jwt.sign(
     { id: user.id, name: user.name, email: user.email },
-    process.env.JWT_SECRET,
+    getJwtSecret(),
     { expiresIn: '7d' }
   );
 }

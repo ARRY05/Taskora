@@ -4,6 +4,7 @@
 // ============================================================
 
 const jwt = require('jsonwebtoken');
+const { getJwtSecret } = require('../config');
 
 function authMiddleware(req, res, next) {
   // Expect header: Authorization: Bearer <token>
@@ -15,7 +16,7 @@ function authMiddleware(req, res, next) {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, getJwtSecret());
     req.user = decoded;  // { id, name, email }
     next();
   } catch (err) {
