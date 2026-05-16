@@ -1,19 +1,22 @@
-const { initDb } = require('../db');
+const { initDb, runQuery } = require('../db');
 
 const ADMIN_ROLE = 'Admin';
 
 function normalizeRole(role) {
-  if (!role) return null;
-  return String(role).toUpperCase() === 'ADMIN' ? ADMIN_ROLE : 'Member';
+  return String(role || '').toUpperCase() === 'ADMIN' ? ADMIN_ROLE : 'Member';
 }
 
 async function getProjectRole(projectId, userId) {
   const db = await initDb();
-  const membership = db.prepare(
-    'SELECT role FROM project_members WHERE project_id = ? AND user_id = ?'
-  ).get(projectId, userId);
+  const { data } = await runQuery(
+    db.from('project_members')
+      .select('role')
+      .eq('project_id', Number(projectId))
+      .eq('user_id', Number(userId))
+      .maybeSingle()
+  );
 
-  return membership ? normalizeRole(membership.role) : null;
+  return data ? normalizeRole(data.role) : null;
 }
 
 function requireProjectMember(resolveProjectId) {

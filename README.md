@@ -1,17 +1,17 @@
 # Taskora
 
-Taskora is a full-stack team task manager where users can create projects, manage team members, assign tasks, and track progress with project-level Admin and Member access.
+Taskora is a full-stack team task manager where users can create projects, manage members, assign tasks, and track progress with project-level Admin and Member access.
 
 ## Features
 
 - Signup and login with JWT authentication
 - Password hashing with bcrypt
+- Hosted Supabase database
 - Project creation with creator assigned as Admin
 - Project member management by Admin users
 - Task creation, assignment, status tracking, and deletion
 - Member access limited to assigned tasks
-- Dashboard summary for task counts, status, overdue work, and workload per user
-- REST APIs backed by a SQL database
+- Dashboard summary for task totals, status, overdue work, and workload per user
 
 ## Tech Stack
 
@@ -19,9 +19,32 @@ Taskora is a full-stack team task manager where users can create projects, manag
 | --- | --- |
 | Frontend | HTML, CSS, Vanilla JavaScript |
 | Backend | Node.js, Express |
-| Database | SQLite through `sql.js` |
+| Database | Supabase Postgres |
 | Auth | JWT, bcryptjs |
 | Deployment Target | Railway |
+
+## Supabase Setup
+
+1. Create a Supabase project.
+2. Open **SQL Editor** in Supabase.
+3. Run the SQL from `supabase-schema.sql`.
+4. Copy the project URL and anon key from **Project Settings > API**.
+
+The backend seeds demo data automatically when the `users` table is empty.
+
+## Environment Variables
+
+Use these variables locally and on Railway:
+
+```env
+JWT_SECRET_KEY=your_strong_jwt_secret
+VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_APP_NAME=Taskora
+VITE_APP_ENV=production
+```
+
+`JWT_SECRET` is also supported, but `JWT_SECRET_KEY` is recommended for this deployment.
 
 ## Data Model
 
@@ -30,59 +53,10 @@ Taskora is a full-stack team task manager where users can create projects, manag
 - `project_members`: project membership with Admin or Member role
 - `tasks`: task details, assignee, creator, due date, status, and priority
 
-Task enums are stored as strict backend values:
+Task enums:
 
 - Status: `TODO`, `IN_PROGRESS`, `DONE`
 - Priority: `LOW`, `MEDIUM`, `HIGH`
-
-## API Overview
-
-### Auth
-
-| Method | Endpoint | Description |
-| --- | --- | --- |
-| POST | `/api/auth/signup` | Create account |
-| POST | `/api/auth/login` | Login and receive JWT |
-
-### Projects
-
-| Method | Endpoint | Access |
-| --- | --- | --- |
-| GET | `/api/projects` | Project members |
-| POST | `/api/projects` | Authenticated users |
-| GET | `/api/projects/:id` | Project members |
-| POST | `/api/projects/:id/members` | Project Admin |
-| DELETE | `/api/projects/:id/members/:uid` | Project Admin |
-| DELETE | `/api/projects/:id` | Project Admin |
-
-### Tasks
-
-| Method | Endpoint | Access |
-| --- | --- | --- |
-| GET | `/api/tasks?project_id=:id` | Admin sees project tasks; Member sees assigned tasks |
-| GET | `/api/tasks/my` | Current user's assigned tasks |
-| POST | `/api/tasks` | Project Admin |
-| PUT | `/api/tasks/:id` | Admin updates task; Member updates assigned task status |
-| DELETE | `/api/tasks/:id` | Project Admin |
-
-### Dashboard
-
-| Method | Endpoint | Description |
-| --- | --- | --- |
-| GET | `/api/dashboard` | Returns task totals, status totals, overdue count, and tasks per user |
-
-Dashboard response shape:
-
-```json
-{
-  "totalTasks": 12,
-  "completedTasks": 5,
-  "inProgressTasks": 4,
-  "todoTasks": 3,
-  "overdueTasks": 2,
-  "tasksPerUser": []
-}
-```
 
 ## Local Setup
 
@@ -94,41 +68,47 @@ npm start
 
 Open `http://localhost:3000`.
 
-## Environment Variables
+## Demo Account
 
-| Variable | Description |
-| --- | --- |
-| `JWT_SECRET` | Secret used to sign JWT tokens |
-| `JWT_SECRET_KEY` | Optional fallback secret if the host does not expose `JWT_SECRET` correctly |
-| `PORT` | Server port |
-| `NODE_ENV` | Runtime environment |
-
-## Demo Accounts
-
-The database seeds demo users on first run. Each seeded account uses:
+After the first successful database connection, the app seeds demo accounts.
 
 ```text
-Password@123
+Email: aryan@taskora.app
+Password: Password@123
 ```
 
-Example Admin login:
+## API Overview
 
-```text
-aryan@taskora.app
-```
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| POST | `/api/auth/signup` | Create account |
+| POST | `/api/auth/login` | Login and receive JWT |
+| GET | `/api/projects` | List current user's projects |
+| POST | `/api/projects` | Create project |
+| GET | `/api/projects/:id` | Project detail and members |
+| POST | `/api/projects/:id/members` | Add member, Admin only |
+| DELETE | `/api/projects/:id/members/:uid` | Remove member, Admin only |
+| GET | `/api/tasks?project_id=:id` | List tasks by project |
+| GET | `/api/tasks/my` | Current user's assigned tasks |
+| POST | `/api/tasks` | Create task, Admin only |
+| PUT | `/api/tasks/:id` | Update task |
+| DELETE | `/api/tasks/:id` | Delete task, Admin only |
+| GET | `/api/dashboard` | Dashboard summary |
+| GET | `/api/health` | Deployment health check |
 
 ## Railway Deployment
 
-1. Push the project to a GitHub repository.
-2. Create a Railway project from that repository.
-3. Add environment variables in Railway:
+1. Push the project to GitHub.
+2. Create a Railway project from the GitHub repository.
+3. Add the environment variables listed above to the Railway service.
+4. Redeploy the service.
+5. Check `/api/health`.
 
-```text
-JWT_SECRET_KEY=your_strong_secret
-NODE_ENV=production
+Expected health flags:
+
+```json
+{
+  "hasJwtSecret": true,
+  "hasSupabaseConfig": true
+}
 ```
-
-4. Railway will run `npm start`.
-5. Generate a public domain from Railway networking settings.
-
-The app stores SQLite data in `taskora.db`. For long-term production persistence on Railway, use a managed database such as PostgreSQL.

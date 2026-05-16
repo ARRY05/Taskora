@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { initDb } = require('../db');
+const { initDb, runQuery } = require('../db');
 const auth = require('../middleware/auth');
 
 router.use(auth);
@@ -8,14 +8,14 @@ router.use(auth);
 router.get('/', async (req, res) => {
   try {
     const db = await initDb();
-    const userId = req.user.id;
     const today = new Date().toISOString().split('T')[0];
 
-    const myProjects = db.prepare(
-      'SELECT project_id FROM project_members WHERE user_id = ?'
-    ).all(userId);
+    const { data: memberships } = await runQuery(
+      db.from('project_members').select('project_id').eq('user_id', req.user.id)
+    );
 
-    if (myProjects.length === 0) {
+    const projectIds = memberships.map(row => row.project_id);
+    if (projectIds.length === 0) {
       return res.json({
         totalTasks: 0,
         completedTasks: 0,
@@ -28,67 +28,75 @@ router.get('/', async (req, res) => {
       });
     }
 
-    const ids = myProjects.map(row => row.project_id);
-    const placeholders = ids.map(() => '?').join(',');
+    const { data: tasks } = await runQuery(
+      db.from('tasks').select('*').in('project_id', projectIds)
+    );
 
-    const totalTasks = db.prepare(
-      `SELECT COUNT(*) AS c FROM tasks WHERE project_id IN (${placeholders})`
-    ).get(...ids).c;
+    const totalTasks = tasks.length;
+    const completedTasks = tasks.filter(task => task.status === 'DONE').length;
+    const inProgressTasks = tasks.filter(task => task.status === 'IN_PROGRESS').length;
+    const todoTasks = tasks.filter(task => task.status === 'TODO').length;
+    const overdueTasks = tasks.filter(task =>
+      task.due_date && task.due_date < today && task.status !== 'DONE'
+    ).length;
 
-    const statusRows = db.prepare(
-      `SELECT status, COUNT(*) AS count
-       FROM tasks
-       WHERE project_id IN (${placeholders})
-       GROUP BY status`
-    ).all(...ids);
+    const assignedIds = [...new Set(tasks.map(task => task.assigned_to).filter(Boolean))];
+    const { data: users } = assignedIds.length
+      ? await runQuery(db.from('users').select('id,name,email').in('id', assignedIds))
+      : { data: [] };
+    const userMap = new Map(users.map(user => [user.id, user]));
+    const perUserMap = new Map();
 
-    const statusCounts = { TODO: 0, IN_PROGRESS: 0, DONE: 0 };
-    statusRows.forEach(row => {
-      if (Object.prototype.hasOwnProperty.call(statusCounts, row.status)) {
-        statusCounts[row.status] = row.count;
-      }
+    tasks.forEach(task => {
+      if (!task.assigned_to) return;
+      const current = perUserMap.get(task.assigned_to) || {
+        id: task.assigned_to,
+        name: userMap.get(task.assigned_to)?.name || '',
+        email: userMap.get(task.assigned_to)?.email || '',
+        totalTasks: 0,
+        completedTasks: 0,
+      };
+
+      current.totalTasks += 1;
+      if (task.status === 'DONE') current.completedTasks += 1;
+      perUserMap.set(task.assigned_to, current);
     });
 
-    const overdueTasks = db.prepare(
-      `SELECT COUNT(*) AS c FROM tasks
-       WHERE project_id IN (${placeholders})
-         AND due_date IS NOT NULL
-         AND due_date < ?
-         AND status != 'DONE'`
-    ).get(...ids, today).c;
+    const projectNames = new Map();
+    const { data: projects } = await runQuery(
+      db.from('projects').select('id,name').in('id', projectIds)
+    );
+    projects.forEach(project => projectNames.set(project.id, project.name));
 
-    const tasksPerUser = db.prepare(
-      `SELECT u.id, u.name, u.email,
-              COUNT(t.id) AS totalTasks,
-              SUM(CASE WHEN t.status = 'DONE' THEN 1 ELSE 0 END) AS completedTasks
-       FROM users u
-       JOIN tasks t ON t.assigned_to = u.id
-       WHERE t.project_id IN (${placeholders})
-       GROUP BY u.id
-       ORDER BY totalTasks DESC
-       LIMIT 10`
-    ).all(...ids);
+    const recentUserIds = [...new Set(tasks.flatMap(task => [task.assigned_to]).filter(Boolean))];
+    const recentUserMap = await (async () => {
+      if (!recentUserIds.length) return new Map();
+      const { data } = await runQuery(db.from('users').select('id,name').in('id', recentUserIds));
+      return new Map(data.map(user => [user.id, user.name]));
+    })();
 
-    const recentTasks = db.prepare(
-      `SELECT t.id, t.title, t.status, t.priority, t.due_date,
-              u.name AS assigned_to_name, p.name AS project_name
-       FROM tasks t
-       LEFT JOIN users u ON u.id = t.assigned_to
-       LEFT JOIN projects p ON p.id = t.project_id
-       WHERE t.project_id IN (${placeholders})
-       ORDER BY t.created_at DESC
-       LIMIT 5`
-    ).all(...ids);
+    const recentTasks = [...tasks]
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .slice(0, 5)
+      .map(task => ({
+        id: task.id,
+        title: task.title,
+        status: task.status,
+        priority: task.priority,
+        due_date: task.due_date,
+        assigned_to_name: recentUserMap.get(task.assigned_to) || null,
+        project_name: projectNames.get(task.project_id) || '',
+      }));
 
     res.json({
       totalTasks,
-      completedTasks: statusCounts.DONE,
-      inProgressTasks: statusCounts.IN_PROGRESS,
-      todoTasks: statusCounts.TODO,
+      completedTasks,
+      inProgressTasks,
+      todoTasks,
       overdueTasks,
-      tasksPerUser,
+      tasksPerUser: [...perUserMap.values()].sort((a, b) => b.totalTasks - a.totalTasks).slice(0, 10),
       recentTasks,
-      totalProjects: myProjects.length,
+      totalProjects: projectIds.length,
     });
   } catch (err) {
     res.status(500).json({ error: err.message });

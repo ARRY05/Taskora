@@ -9,11 +9,15 @@ const express   = require('express');
 const cors      = require('cors');
 const path      = require('path');
 const { initDb } = require('./db');
-const { getJwtSecret } = require('./config');
+const { getAppEnv, getAppName, getJwtSecret, getSupabaseAnonKey, getSupabaseUrl } = require('./config');
 
 const hasJwtSecret = Boolean(getJwtSecret());
+const hasSupabaseConfig = Boolean(getSupabaseUrl() && getSupabaseAnonKey());
 if (!hasJwtSecret) {
   console.error('Missing required environment variable: JWT_SECRET or JWT_SECRET_KEY');
+}
+if (!hasSupabaseConfig) {
+  console.error('Missing Supabase variables: VITE_SUPABASE_URL and/or VITE_SUPABASE_ANON_KEY');
 }
 
 const app = express();
@@ -28,7 +32,7 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // ── Boot: init DB first, then mount routes & start server ─
 async function boot() {
-  // sql.js loads a WASM binary – must await before using DB
+  // Verify Supabase connectivity and seed demo data when needed.
   await initDb();
   console.log('Database ready.');
 
@@ -42,9 +46,10 @@ async function boot() {
   app.get('/api/health', (req, res) => {
     res.json({
       status: 'ok',
-      app: 'Taskora',
-      env: process.env.NODE_ENV || 'development',
+      app: getAppName(),
+      env: getAppEnv(),
       hasJwtSecret,
+      hasSupabaseConfig,
       timestamp: new Date().toISOString()
     });
   });
