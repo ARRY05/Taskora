@@ -23,12 +23,18 @@ Taskora is a full-stack team task manager where users can create projects, manag
 | Auth | JWT, bcryptjs |
 | Deployment Target | Railway |
 
+## Requirements
+
+- Node.js 20 or later
+- npm
+- Supabase project
+
 ## Supabase Setup
 
 1. Create a Supabase project.
 2. Open **SQL Editor** in Supabase.
 3. Run the SQL from `supabase-schema.sql`.
-4. Copy the project URL and anon key from **Project Settings > API**.
+4. Copy the project URL and `anon public` key from **Project Settings > API**.
 
 The backend seeds demo data automatically when the `users` table is empty.
 
@@ -45,6 +51,8 @@ VITE_APP_ENV=production
 ```
 
 `JWT_SECRET` is also supported, but `JWT_SECRET_KEY` is recommended for this deployment.
+
+Use the Supabase `anon public` key. Do not use the `service_role` key in Railway or any public deployment environment.
 
 ## Data Model
 
@@ -100,15 +108,18 @@ Password: Password@123
 
 1. Push the project to GitHub.
 2. Create a Railway project from the GitHub repository.
-3. Add the environment variables listed above to the Railway service.
+3. Open the Railway **web** service and add the environment variables listed above in the service **Variables** tab.
 4. Redeploy the service.
 5. Check `/api/health`.
 
-Expected health flags:
+Expected health response flags:
 
 ```json
 {
   "hasJwtSecret": true,
-  "hasSupabaseConfig": true
+  "hasSupabaseConfig": true,
+  "dbReady": true
 }
 ```
+
+If `status` is `degraded`, check `dbError` in the health response. Common causes are missing Railway variables, an incorrect Supabase URL/key, or the Supabase schema not being run yet.
