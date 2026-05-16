@@ -10,6 +10,11 @@ const cors      = require('cors');
 const path      = require('path');
 const { initDb } = require('./db');
 
+const hasJwtSecret = Boolean(process.env.JWT_SECRET && process.env.JWT_SECRET.trim());
+if (!hasJwtSecret) {
+  console.error('Missing required environment variable: JWT_SECRET');
+}
+
 const app = express();
 
 // ── Middleware ────────────────────────────────────────────
@@ -34,7 +39,13 @@ async function boot() {
 
   // Health check
   app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', app: 'Taskora', timestamp: new Date().toISOString() });
+    res.json({
+      status: 'ok',
+      app: 'Taskora',
+      env: process.env.NODE_ENV || 'development',
+      hasJwtSecret,
+      timestamp: new Date().toISOString()
+    });
   });
 
   // Catch-all: serve index.html (lets frontend handle unknown paths)
