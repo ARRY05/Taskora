@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const { createClient } = require('@supabase/supabase-js');
+const WebSocket = require('ws');
 const { getSupabaseAnonKey, getSupabaseUrl } = require('./config');
 
 let supabase = null;
@@ -17,6 +18,7 @@ function getSupabaseClient() {
 
   supabase = createClient(url, anonKey, {
     auth: { persistSession: false },
+    realtime: { transport: WebSocket },
   });
 
   return supabase;
